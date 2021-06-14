@@ -1,0 +1,92 @@
+# Lista de funciones y palabras reservadas
+
+bool setOpMode(int8 mode) ​
+    mode:​
+        - Standby = 0​
+        - Transmit = 1​
+        - Receive = 2​
+        - Sensor = 3
+--------------------------------------
+bool setFrqBndSel (int8 fb, bool hbsel) 
+    fb= 19​
+    hbsel = 1​
+--------------------------------------    
+bool setFrq (int16 frecuencia) 
+    frecuencia:​
+        - FrqTx = 50240​
+        - FrqRx = 50400
+--------------------------------------
+bool setStpHop (int8 stepsize) ​
+    stepsize = 2​
+--------------------------------------
+bool setFrqHop (int8 hop) ​
+    hop:​
+        - hopToTx = 0​
+        - hopToRx = 1​
+--------------------------------------
+bool setFrqDev (int16 desvF) ​
+    desvF:​
+    desvON = (por definir)​
+    desvOFF = 0​
+--------------------------------------
+bool setFrqOff (int16 numoffset) ​
+    offset <= 1023​
+--------------------------------------
+bool setTxKbps (int16 numdatrate) ​
+    Si: ​
+    numdatrate < (por definir)​
+        - txdtrtscale = 1​
+    numdatrate > (por definir)​
+        - txdtrtscale = 0​
+    Si: ​
+    numdatrate < (por definir)​
+        - registro 58h  = C0h​
+    numdatrate > (por definir)​
+        - registro 58h = 80h
+--------------------------------------
+bool setTxPwr (bool lna_sw, int8 power) ​
+    power:​
+        - Max = 7​
+        - Mid = 6​
+        - Min = 5​
+--------------------------------------
+bool setModCtl(int8 modTxRx)
+    modTxRx:
+        - unmod = 1
+        - fskpacket = 2
+        - ookpacket = 3
+        - fskdirect = 4
+        - ookdirect = 5
+--------------------------------------
+bool setIdlMod(int8 idlemode)
+--------------------------------------
+bool setBufInf(int8 dataTx[], int8 len)
+--------------------------------------
+bool startClrBuf()
+--------------------------------------
+bool setPreLgt(int8 Preambulo)
+--------------------------------------
+bool setSynWrd(int8 defsyncword, int8 regselsyncwrd)
+        regselsyncwrd = [1:0]
+--------------------------------------
+bool setSynWrdLgt(int8 synclenght)
+        synclenght = [1:0]
+--------------------------------------
+int8 getTmpLct()
+    0Fh |= 0b10000000     //Trigger lecture of ADC
+    ADCval = 11h          //Read lecture  ADC value 
+    Temp = ADCval - 64    //Temperatura en C°
+--------------------------------------
+bool setSnsrConf()
+    0Fh &= ~0b01111100
+    12h &= ~0b10000000
+    12h |= 0b01100000
+
+    //0Fh ADC config - adcsel [2:0] = 000 = -000----
+    //0Fh ADC config - adcref [1:0] = 00  = ----00--
+    //.: 0Fh = -00000--
+
+    //12h Temp Sensor Calibration - tsrange [1:0] =  01 = 01------
+    //12h Temp Sensor Calibration - entsoffs [0]  = 1   = --1-----
+    //.: 12h = 011-----
+--------------------------------------
