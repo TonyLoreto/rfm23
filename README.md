@@ -1,1 +1,1 @@
-# Libary for RFM23
+# Library for RFM23

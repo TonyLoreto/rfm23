@@ -7,11 +7,22 @@
 
 //Modos de Operacion
 #define uint8_t standby= 0x00;
-#define uint8_t transmit= 0x09;
-#define uint8_t receive=  0x05;
+#define uint8_t transmit= 0x08;
+#define uint8_t receive=  0x04;
 #define uint8_t sensor= 0x11; 
+//#define uint8_t transmit= 0x09;
+//#define uint8_t receive=  0x05;
 
-//Variable para temperatura
+//Registros y Constantes para Sensor de Temperatura 
+#define uint8_t adcConfSensor = 0x83;//Temp ADC conf Apagar 1000 0011 
+#define uint8_t adcConfSensorTrigger = 0x80;//Temp ADC Trigger Encender 1000 0000
+#define uint8_t adcConf= 0x0f;//ADC Configuration Reg
+#define uint8_t adcValue = 0x11;//ADC Value
+#define uint8_t tempSensorControlConf = 0x00;//Temp Sensor Control Conf
+#define uint8_t tempSensorControl = 0x12;//Temp Sensor Control Reg
+//#define uint8_t adcConfSensor = 0x13;//Temp Sensor Calibration Reg
+
+//Variable para Temperatura
 uint8_t tempVal = 0;
 
 //Configuracion de Frecuencia
@@ -50,9 +61,30 @@ bool lna= 0;
 
 //Modos de operacion
 void setOpMode(uint8_t mode){
-	uint8_t aux=0;
-	if(){
+	uint8_t aux = mode;
 		setFrqBndSel(freq, hesel)
+	if( aux == standby )
+	{
+		write(regOpMode, standby);
+	}
+	if( aux == transmit )
+	{
+		write(regOpMode, transmit);
+	}
+	if( aux == receive )
+	{
+		write(regOpMode, receive);
+	}
+	if( aux == sensor )
+	{
+		uint8_t aux=0;
+		aux = read(adcConf) & adcConfSensor;
+		write(adcConf, aux);
+		aux = read(tempSensorControl) & tempSensorControlConf;
+		write(tempSensorControl, aux);
+		aux = read(adcConf) | adcConfSensorTrigger;
+		write(adcConf, aux);
+		tempVal = read(adcValue);
 	}
 
 }
