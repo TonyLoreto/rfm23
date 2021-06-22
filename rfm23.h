@@ -62,11 +62,11 @@ bool lna= 0;
 #define uint8_t powerMid= 6;
 #define uint8_t powerMax= 7;
 
-#define uint8_t UnMod= 00h;
-#define uint8_t FSKPacket= 22h;
-#define uint8_t OOKPacket= 21h;
-#define uint8_t FSKDirect= 92h;
-#define uint8_t OOKDirect= 91h;
+#define uint8_t UnMod= 0x00;
+#define uint8_t FSKPacket= 0x22;
+#define uint8_t OOKPacket= 0x21;
+#define uint8_t FSKDirect= 0x92;
+#define uint8_t OOKDirect= 0x91;
 
 //Modos de operacion
 void setOpMode(uint8_t mode){
@@ -103,14 +103,14 @@ void setOpMode(uint8_t mode){
 //hbsel depende de 
 void setFrqBndSel(uint16_t freq, bool hbsel){
 	uint8_t aux = 0;
-	if (hbsel=1)
+	if (hbsel==1)
 	{
 		aux = read(freqBandSelect) | fB | (hbsel<<5);
 		write(freqBandSelect, aux);
 		write(nominalCarrierF1, (uint8_t)(freq >> 8));
 		write(nominalCarrierF0, (uint8_t)(freq));
 	}
-	if (hbsel=0)
+	if (hbsel==0)
 		{
 			aux = read(freqBandSelect) | fB & (hbsel<<5);
 			write(freqBandSelect, aux);
@@ -125,12 +125,12 @@ void setFrqBndSel(uint16_t freq, bool hbsel){
 
 //Selector de Frecuencia de Salto 
 //freq+hop*(stepSize*10KHz)
-void setFrqHop(uint16_t freq, bool hsel, uint8_t hop, uint8_t stepSize){
-	setFrqBndSel(freq, hesel);
+void setFrqHop(uint16_t freq, bool hbsel, uint8_t hop, uint8_t stepSize){//Quitar hop, agregar fB
+	setFrqBndSel(freq, hbsel);
 	setStpHop(hop, stepSize);
 }
 //Salto de Frecuencia
-void setStpHop(uint8_t hop, uint8_t stepSize){//hop*(stepSize*10KHz)
+void setStpHop(uint8_t hop, uint8_t stepSize){//hop*(stepSize*10KHz)//quitar step size
 	write(frqHopCh, hop);
 	write(frqHopStep, stepSize);
 }
