@@ -29,7 +29,7 @@ uint8_t tempVal = 0;
 #define uint8_t freqBandSelect= 0x75;//Frecuency Band Sel Reg
 #define uint8_t nominalCarrierF1= 0x76;//
 #define uint8_t nominalCarrierF0= 0x77;
-#define uint8_t fB= 19;
+uint8_t fB= 19;
 
 #define uint16_t frqTx= 50240;
 #define uint16_t frqRx= 50400;
@@ -53,6 +53,9 @@ uint8_t tempVal = 0;
 uint16_t offset= 0;
 
 //Tasa de Datos
+#define uint8_t txDataR1= 0x6E;//Reg Tx Data Rate 1
+#define uint8_t txDataR0= 0x6f;//Reg Tx Data Rate 0
+
 uint16_t dataRate=0;
 bool txdtrtscale=0;
 
@@ -62,6 +65,7 @@ bool lna= 0;
 #define uint8_t powerMid= 6;
 #define uint8_t powerMax= 7;
 
+//Modulacion
 #define uint8_t UnMod= 0x00;
 #define uint8_t FSKPacket= 0x22;
 #define uint8_t OOKPacket= 0x21;
@@ -87,6 +91,7 @@ void setOpMode(uint8_t mode){
 	}
 	if( aux == sensor )
 	{
+		write(regOpMode, sensor);
 		uint8_t aux=0;
 		aux = read(adcConf) & adcConfSensor;
 		write(adcConf, aux);
@@ -101,7 +106,7 @@ void setOpMode(uint8_t mode){
 
 //Configuracion de Frecuencia
 //hbsel depende de 
-void setFrqBndSel(uint16_t freq, bool hbsel){
+void setFrqBndSel(uint16_t freq, bool hbsel, uint8_t fB){
 	uint8_t aux = 0;
 	if (hbsel==1)
 	{
@@ -125,14 +130,17 @@ void setFrqBndSel(uint16_t freq, bool hbsel){
 
 //Selector de Frecuencia de Salto 
 //freq+hop*(stepSize*10KHz)
-void setFrqHop(uint16_t freq, bool hbsel, uint8_t hop, uint8_t stepSize){//Quitar hop, agregar fB
-	setFrqBndSel(freq, hbsel);
-	setStpHop(hop, stepSize);
+void setFrqHop(uint16_t freq, bool hbsel, uint8_t fB, uint8_t stepSize){//Quitar hop, agregar fB
+	setFrqBndSel(freq, hbsel, fb);
+	setStpHop(stepSize);
 }
 //Salto de Frecuencia
-void setStpHop(uint8_t hop, uint8_t stepSize){//hop*(stepSize*10KHz)//quitar step size
+void setStpHop(uint8_t stepSize){//hop*(stepSize*10KHz)
+		write(frqHopStep, stepSize);
+}
+
+void setFrqHop(uint8_t hop){
 	write(frqHopCh, hop);
-	write(frqHopStep, stepSize);
 }
 
 //Desviacion de Frecuencia
@@ -152,26 +160,32 @@ void setFrqOff(uint16_t numOffset){
 //Tasa de Datos
 void setTxKbps(uint16_t numDataRate, bool rang){
 	if( 258 <= numDataRate <= 62915 && rang == 0 ){
-
+		aux= read(regOpMode) | 0x20;
+		write(regOpMode, aux);
+		write(txDataR1, (uint8_t)(numDataRate >> 8));
+		write(txDataR0, (uint8_t)(numDataRate));
 	}
-	if( 2032 <= numDataRate <= 16778 && rang =1 ){
-
+	if( 2032 <= numDataRate <= 16778 && rang =1 ){//Agregar condicion para reg 58h numDataRete<6554
+		aux = read(regOpMode) & 0xDF;
+		write(regOpMode, aux);
+		write(txDataR1, (uint8_t)(numDataRate >> 8));
+		write(txDataR0, (uint8_t)(numDataRate));
 	}
 	else{
 
 	}
 }
-
 //Potencia
 void setTxPwr(bool lna_sw, uint8_t txPow){
 	uint8_t aux = 0;
 	aux = read(outPower) | txPow | (lna_sw<<3);
 	write(outPower, aux);
 }
-
 //Modulacion
 void setModCtl(uint8_t modTxRx){
-
+	uint8_t aux = 0;
+	aux = read(modMC) | modTxRx;
+	write(modMC, aux);
 }
 
 #endif
